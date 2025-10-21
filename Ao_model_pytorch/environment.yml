@@ -1,0 +1,33 @@
+name: basal_ganglia
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  # Python
+  - python=3.10
+
+  # PyTorch with CUDA support (adjust cuda version if needed)
+  # For CUDA 11.8:
+  - pytorch>=2.0.0
+  - torchvision>=0.15.0
+  - torchaudio>=2.0.0
+  - pytorch-cuda=11.8
+
+  # Scientific Computing
+  - numpy>=1.24.0
+  - scipy>=1.11.0
+
+  # Visualization
+  - matplotlib>=3.7.0
+  - seaborn>=0.12.0
+
+  # Utilities
+  - tqdm>=4.65.0
+
+  # pip packages (not available in conda)
+  - pip
+  - pip:
+      - spikingjelly>=0.0.0.0.14
+      - gymnasium>=0.29.0

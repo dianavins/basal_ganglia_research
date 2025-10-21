@@ -273,7 +273,7 @@ class BasalGangliaTrainer:
         if not eval_mode:
             epsilon = self.get_epsilon(episode_num)
         else:
-            epsilon = 0.0  # No exploration during evaluation
+            epsilon = self.config.EVAL_EPSILON  # Small exploration during eval to avoid getting stuck
 
         while not done and episode_length < self.config.MAX_STEPS_PER_EPISODE:
             # Actor selects action (with epsilon-greedy exploration)
@@ -296,8 +296,10 @@ class BasalGangliaTrainer:
                     state, action, reward, next_state, done
                 )
                 critic_losses.append(critic_loss)
-            if episode_length % 10 == 0:
-                print(f"step {episode_length} | state {state} | action {action} | reward {reward} | done {done} | loss {critic_loss if not eval_mode else 'N/A'} | td_error {td_error if not eval_mode else 'N/A'}")
+
+                # Print detailed step info during training only
+                if episode_length % 10 == 0:
+                    print(f"step {episode_length} | state {state} | action {action} | reward {reward} | done {done} | loss {critic_loss:.5f} | td_error {td_error:.5f}")
 
             state = next_state
 

@@ -86,8 +86,8 @@ class Config:
     # Each stage: {'episodes': max_episode_for_stage, 'start_states': [allowed states]}
     # start_states=None means any state (full problem)
     CURRICULUM_STAGES = [
-        {'episodes': 500, 'start_states': [10, 11, 14]},  # Stage 1: Very close to goal (1-2 steps)
-        {'episodes': 1000, 'start_states': [6, 7, 9, 10, 11, 13, 14]},  # Stage 2: Medium distance (2-4 steps)
+        {'episodes': 1000, 'start_states': [10, 11, 14]},  # Stage 1: Very close to goal (1-2 steps) - EXTENDED
+        {'episodes': 1500, 'start_states': [6, 7, 9, 10, 11, 13, 14]},  # Stage 2: Medium distance (2-4 steps)
         {'episodes': 2000, 'start_states': None}  # Stage 3: Full problem (any starting state)
     ]
 
@@ -96,6 +96,7 @@ class Config:
     EVAL_INTERVAL = 50  # Evaluate every N episodes
     SAVE_INTERVAL = 100  # Save model every N episodes
     N_EVAL_EPISODES = 10  # Number of episodes for evaluation
+    EVAL_EPSILON = 0.05  # Small epsilon during evaluation to avoid getting stuck
 
     # Visualization
     PLOT_FIRING_RATES = True  # Plot neuron firing rates (like Figure 3)
