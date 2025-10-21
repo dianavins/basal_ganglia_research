@@ -1,0 +1,659 @@
+Natural behaviour is learned through dopamine-mediated reinforcement | Nature
+The mouse cortico–basal ganglia–thalamic network | Nature
+Organization of reward and movement signals in the basal ganglia and cerebellum | Nature Communications
+Distinct basal ganglia contributions to learning from implicit and explicit value signals in perceptual decision-making | Nature Communications
+Anatomically segregated basal ganglia pathways allow parallel behavioral modulation | Nature Neuroscience
+Frontiers | Shifting Responsibly: The Importance of Striatal Modularity to Reinforcement Learning in Uncertain Environments
+A modeling framework for adaptive lifelong learning with transfer and savings through gating in the prefrontal cortex | PNAS
+Dopamine builds and reveals reward-associated latent behavioral attractors | Nature Communications
+
+
+A spiking neuron model of the cortico-basal ganglia circuits for goal-directed and habitual action learning (Chersi et al., 2013):
+Methodology
+Model Architecture:
+A multi-layer spiking neuron network simulating PFC, motor/sensory cortices, thalamus, and BG subregions (striatum, STN, GPe, SNr).
+Neurons are organized into task-specific pools (100 neurons each) with small-world connectivity.
+Leaky integrate-and-fire neurons with AMPA/NMDA/GABA dynamics and dopamine modulation.
+Learning Mechanism:
+STDP + eligibility traces: Synaptic weights (sensory→BG, PFC→motor cortex) are updated based on reward-driven dopamine signals.
+Rewards strengthen recently active pathways; punishments weaken them.
+Task:
+A virtual monkey learns to press buttons to illuminate lights (3-button/3-light setup).
+Two phases:
+Habit formation: Learn button-light associations (3000 trials).
+Cue reversal: Remap associations to test goal-directed override (PFC vs. BG control).
+Validation Metrics:
+Success rate, task completion time, neural activity patterns.
+Results
+Learning Phase:
+The network learned optimal motor sequences (e.g., look button → reach → press → look light).
+Shorter sequences emerged due to higher reward eligibility (e.g., look button → reach → look light → press).
+Goal-specific motor encoding: Motor neurons differentiated actions based on the end-goal, matching neurophysiological data.
+Cue Reversal:
+With PFC control: Rapid recovery after remapping (goal-directed override).
+Without PFC control: Slow relearning (habitual system must adapt from scratch).
+PFC’s "hyperdirect pathway" to STN inhibited BG output, enabling cognitive control.
+Neural Dynamics:
+BG channels showed competition; winning actions were selectively disinhibited.
+Striatal firing became more targeted with learning, reducing random exploration.
+Analysis of results
+STDP + dopamine sufficed for unsupervised sequence learning, avoiding temporal difference (TD) methods.
+Goal-specific motor pools emerged spontaneously, aligning with primate studies (e.g., Fogassi et al., 2005).
+Future work
+Simplified PFC-BG connectivity; future models could integrate parietal/premotor cortices.
+Embodied agents/robots could test real-world generalization
+
+
+
+Shifting responsibly: the importance of striatal modularity to reinforcement learning in uncertain environments (Amemori, 2011)
+Research question
+How does the modular organization of the striatum (striosome-matrisome domains) support reinforcement learning (RL) in uncertain environments, and how do the direct and indirect pathways of the basal ganglia contribute to context-dependent module and action selection?
+Hypothesis
+Modular RL Hypothesis: Striosome-matrisome modules not only learn to bias actions (standard RL) but also assess their contextual relevance ("responsibility") via prediction errors of environmental features. Responsibility signals are computed by striosomes and conveyed to matrisomes via local interneurons (e.g., cholinergic and somatostatinergic interneurons).
+Pathway Specialization Hypothesis: The direct pathway promotes actions based on striatal action values, while the indirect pathway acts as a gating network that suppresses or facilitates behavioral modules based on striatal responsibility signals.
+Methodology
+Modular RL Model
+Framework: Markov decision process with state (*s*), action (*a*), and reward (R).
+Components per Module:
+Action-value function (Qₘ(s,a)): Learns values of actions.
+Prediction model: Predicts environmental features (e.g., reward probability).
+Responsibility signal (λₘ(t)): Computed from accumulated prediction errors (decaying over time).
+Module Selection: Softmax rule based on λₘ(t).
+Learning:
+Prediction updates: Adjusted via prediction error (Δ = Rₜ - pₘ).
+Action-value updates: Temporal difference (TD) learning.
+Simulation: Grid-world task with alternating reward locations to test module switching and learning.
+2. Network Model
+Architecture: Simulated cortico-basal ganglia-thalamo-cortical loop, including:
+Striatal modules: D1 (direct pathway) and D2 (indirect pathway) MSNs.
+Responsibility signals: Modulate MSN activity (↑D1, ↓D2 for selected modules).
+Pathway Convergence: Indirect pathway blurs action-specific info, favoring module-level gating; direct pathway preserves action-specific values.
+Connectivity: Gaussian projection functions to model topographic convergence.
+Simulation: Examined activity patterns in basal ganglia nuclei under responsibility signaling.
+Results
+Modular RL Model:
+Modules specialized for distinct environments (e.g., left vs. right reward locations).
+Responsibility signals (λₘ) tracked environmental changes, enabling rapid module switching (~30–50 steps).
+Outperformed non-modular RL, which failed to adapt to reward shifts (Figure 4E vs. 4F).
+Network Model:
+Direct pathway: Encoded action-specific values in GPi/SNr, promoting action selection.
+Indirect pathway: Blurred action details, enabling module-level suppression (via GPe/STN).
+Responsibility effects: Positive signals (↑D1, ↓D2) enhanced module selection; negative signals (↑D2) suppressed irrelevant modules (Figure 7).
+Future Directions
+Experimental Validation:
+Test striosomal prediction errors and responsibility signals in vivo (e.g., optogenetics, calcium imaging).
+Characterize interneuron (e.g., TANs, LTS) roles in relaying striosome-to-matrisome signals.
+Model Extensions:
+Incorporate dopamine’s dual roles (reward prediction error vs. salience) across striosome/matrix.
+Integrate prefrontal/cingulate inputs for higher-order context processing.
+Clinical Applications:
+Investigate striosomal dysfunction in disorders (e.g., dystonia, Huntington’s) linked to maladaptive rigidity/stereotypies.
+Explore therapeutic targets for modular RL disruptions (e.g., cholinergic interventions).
+Computational Advances:
+Scale to larger module counts and hierarchical tasks.
+Compare with other modular architectures (e.g., cerebellar "mixture of experts").
+
+
+
+
+
+Building a Spiking Neural Network Model of the Basal Ganglia on SpiNNaker (Sen-Bhattacharya et al, 2018)
+https://en.wikipedia.org/wiki/SpiNNaker
+Research question
+How can a biologically inspired, scalable spiking neural network (SNN) model of the basal ganglia (BG) be implemented on the SpiNNaker neuromorphic hardware platform to replicate action-selection behavior while maintaining real-time performance and low power consumption?
+Hypothesis
+A conductance-based Izhikevich spiking neuron model, scaled proportionally to anatomical data and implemented on SpiNNaker, will:
+Reproduce BG’s action-selection functionality when tested with competing inputs.
+Show qualitative and functional similarity to simulations on conventional platforms (e.g., SpineML).
+Execute in real time with low power dissipation (~1.8 W for a 3-channel model).
+Methodology
+Neuronal Units: Conductance-based Izhikevich spiking neurons (equations 1–3 in the paper).
+Network Architecture:
+Single-channel BG model: 6 populations (Str-MSN-D1/D2, Str-FSI, STN, GPe, SNr) with neuron counts scaled down from rat anatomical data (Table I).
+3-channel model: Lateral cross-connections between STN populations to enable competition (Figure 4).
+Synapses: AMPA (excitatory) and GABA_A (inhibitory) receptors with dopaminergic modulation (equations 7–9).
+Simulation protocol
+Inputs: Poisson spike trains (3 Hz background; 15/25 Hz competing inputs).
+Action-selection test: Two channels received competing inputs (15 Hz vs. 25 Hz); third channel neutral (3 Hz).
+Metrics:
+Firing rates (equation 10) and spike histograms.
+Statistical comparison (bootstrapped t-test, Appendix).
+Performance (execution time, power measured via Raspberry Pi).
+Results
+Functional Validation
+Single-channel model: Firing rates matched biological data (STN: 10–12 Hz; GPe: 30–32 Hz; SNr: 20–25 Hz; Figure 5).
+3-channel model: Demonstrated action-selection (higher input suppressed competitors; Figure 6). SNr firing rate dropped in "winning" channel (disinhibition).
+Platform Comparison
+Qualitative similarity: SpineML and SpiNNaker outputs aligned (Figure 7).
+Statistical difference: Bootstrapped t-test showed significant spike-count differences (ASL < 0.05; Table IV), attributed to stochastic inputs.
+Performance
+Real-time execution:
+1-ms time-step (0.1-ms solver step): 10× slower than real time but deterministic.
+3-channel model (8,043 neurons) ran in 100 s wall-clock time (10 s simulation).
+Power: 1.8 W for 3-channel model (Figure 9).
+Scalability: Execution time remained constant with model size (unlike SpineML, which scaled poorly; Figure 8).
+
+
+Analysis of results
+
+
+Future Implications
+Hardware Optimization:
+Reduce postprocessing time (Ethernet bottleneck).
+Extend real-time capability to sub-millisecond resolutions.
+Applications:
+Larger multichannel models for robotics/decision-making.
+Clinical studies (e.g., Parkinson’s disease) using dopamine-deficient conditions.
+
+
+A biologically constrained spiking neural network model of the primate basal ganglia with overlapping pathways exhibits action selection (Girard 2020)
+at https://github.com/benoit-girard/sBCBG.
+
+Research question
+The study investigates whether a biologically constrained spiking neural network model of the primate basal ganglia, which includes overlapping direct and indirect pathways, can exhibit action selection
+Hypothesis
+The basal ganglia can perform action selection without strict segregation of the direct and indirect pathways.
+The off-center/on-surround structure of the MSN-STN-GPi circuit and lateral/feedforward inhibitions (MSN-MSN, FSI-MSN) are crucial for selection.
+The centromedian/parafascicular (CM/Pf) thalamic inputs modulate the responsiveness of action selection, possibly regulating the speed-accuracy trade-off in decision-making.
+Methodology
+Neuron Model: Leaky integrate-and-fire (LIF) neurons with biologically realistic parameters (e.g., membrane time constants, firing thresholds).
+Network Structure:
+Based on primate basal ganglia anatomy, including overlapping direct/indirect pathways.
+Includes striatum (MSNs, FSIs), STN, GPe, GPi/SNr, and thalamic (CM/Pf) inputs.
+Three competing channels (representing action alternatives).
+Synaptic Dynamics:
+AMPA, NMDA (excitatory), and GABA (inhibitory) synapses with realistic PSP dynamics.
+Redundancy (ρ = 3): Each input neuron makes ~3 synapses per target neuron.
+Dendritic attenuation modeled based on cable theory.
+Parameterization
+Derived from a prior mean-field model optimized to fit:
+Anatomical data (bouton counts, synapse locations).
+Electrophysiological data (firing rates at rest, responses to neurotransmitter blockers).
+Tonic inputs added to sustain baseline activity in spiking neurons.
+Simulations & Tests
+Validation:
+Compared simulated firing rates to primate electrophysiological data (baseline and pharmacological manipulations).
+Input Sensitivity Analysis:
+Varied activation levels of cortical (CSN, PTN) and thalamic (CM/Pf) inputs.
+Action Selection Test:
+Two-channel competition with salience gradients.
+Measured selection efficiency (how strongly a channel is selected) and distortion (interference between channels).
+Circuit Disruptions:
+Tested roles of MSN-MSN, FSI-MSN, and STN-GPi/GPe projections by altering connectivity.
+Results
+Model Validation
+The spiking model replicated basal ganglia firing rates at rest and under pharmacological perturbations (e.g., AMPA/NMDA/GABA blockers).
+Exhibited β- and γ-band oscillations in STN-GPe loops, consistent with primate data.
+Action Selection
+All models performed action selection despite overlapping pathways.
+Selection mechanisms:
+Off-center/on-surround STN-GPi projections were critical (disrupting them impaired selection).
+Lateral (MSN-MSN) and feedforward (FSI-MSN) inhibition improved selection contrast.
+CM/Pf thalamic inputs modulated selection responsiveness:
+Higher CM/Pf activity reduced selection efficiency, suggesting a role in speed-accuracy trade-off.
+Input-Specific Effects
+CSN activation promoted selection (increased MSN activity, suppressed GPi).
+PTN activation (via STN) could prevent selection by increasing GPi activity.
+CM/Pf activation globally reduced excitability, making selection harder.
+Future Implications
+Temporal Dynamics: Study fine-grained spiking patterns (e.g., oscillations, synchrony) during selection.
+Learning Mechanisms: Incorporate plasticity (e.g., dopamine-dependent striatal learning).
+Thalamic Control: Further explore CM/Pf’s role in behavioral flexibility and decision thresholds.
+Interspecies Comparisons: Extend to rodent models to test pathway segregation hypotheses.
+Clinical Implications: Model Parkinson’s disease (e.g., β-oscillations, deep brain stimulation effects).
+Neuromorphic ig for robotics
+
+
+
+The role of cortical oscillations in a spiking neural network model of the basal ganglia (Fountas, 2017)
+github.com/zfountas/basal-ganglia-model”
+Research question
+How do cortical oscillations influence effective connectivity within the basal ganglia (BG) circuitry, and how does the BG modulate cortical behavior in return?
+Hypothesis
+Frequency-Dependent Gating: Cortical oscillations modulate BG pathways differently based on their frequency (e.g., alpha/beta activate the direct pathway; gamma blocks cortical input via the indirect pathway).
+Parkinsonian Beta Origin: Excessive beta oscillations in Parkinson’s disease (PD) are generated intrinsically in the subthalamic nucleus (STN) but entrained by cortical upper-beta activity.
+Phase-Dependent Connectivity: The phase offset between cortical oscillators influences STN-GPe interactions, altering information flow in BG pathways.
+Methodology
+Model Design
+Neural Network: A spiking neural network model of the BG, including:
+Nuclei: Striatum (MSND1, MSND2, FSIs), STN (rebound-bursting, long-lasting rebound, no-rebound neurons), GPe (types A, B, C), and SNr.
+Synapses: Chemical (AMPA, NMDA, GABA) and electrical (gap junctions), with short-term plasticity.
+Dopamine Modulation: D1/D2 receptor effects on striatal neurons and synapses.
+Simulation Parameters
+Cortical Input: Poisson-based oscillatory inputs (0–100 Hz) to mimic cortical ensembles, with tonic (3 spikes/sec) and phasic (10 spikes/sec) modes.
+Dopamine Levels: Varied to simulate healthy (30%) and PD (0%) states.
+Connectivity: Anatomically derived probabilities (Table 1) and delays (Table 5).
+Key Techniques
+Neuron Models:
+Izhikevich equations for spiking dynamics, tuned to replicate electrophysiological properties (Fig. 7).
+STN neurons included an extra recovery variable to model calcium-dependent bursting.
+Analysis Tools:
+Transfer Entropy (TE): Quantified effective connectivity between nuclei (Eq. 1).
+Multitaper Spectral Analysis: Measured oscillatory power and coherence.
+Surrogate Testing: Validated significance of TE results against shuffled data.
+Experimental Conditions:
+Healthy vs. PD: Compared beta oscillations and synchrony under normal and dopamine-depleted states.
+Phase Offsets: Tested how relative phases between cortical oscillators affected STN-GPe interactions.
+
+
+ResultsModel Design
+Neural Network: A spiking neural network model of the BG, including:
+Nuclei: Striatum (MSND1, MSND2, FSIs), STN (rebound-bursting, long-lasting rebound, no-rebound neurons), GPe (types A, B, C), and SNr.
+Synapses: Chemical (AMPA, NMDA, GABA) and electrical (gap junctions), with short-term plasticity.
+Dopamine Modulation: D1/D2 receptor effects on striatal neurons and synapses.
+Simulation Parameters
+Cortical Input: Poisson-based oscillatory inputs (0–100 Hz) to mimic cortical ensembles, with tonic (3 spikes/sec) and phasic (10 spikes/sec) modes.
+Dopamine Levels: Varied to simulate healthy (30%) and PD (0%) states.
+Connectivity: Anatomically derived probabilities (Table 1) and delays (Table 5).
+Key Techniques
+Neuron Models:
+Izhikevich equations for spiking dynamics, tuned to replicate electrophysiological properties (Fig. 7).
+STN neurons included an extra recovery variable to model calcium-dependent bursting.
+Analysis Tools:
+Transfer Entropy (TE): Quantified effective connectivity between nuclei (Eq. 1).
+Multitaper Spectral Analysis: Measured oscillatory power and coherence.
+Surrogate Testing: Validated significance of TE results against shuffled data.
+Experimental Conditions:
+Healthy vs. PD: Compared beta oscillations and synchrony under normal and dopamine-depleted states.
+Phase Offsets: Tested how relative phases between cortical oscillators affected STN-GPe interactions.
+
+
+Analysis of results
+Extended Circuitry: Incorporate thalamocortical loops to study reverberating oscillations.
+Phase-Amplitude Coupling: Investigate cross-frequency interactions (e.g., theta-gamma).
+Behavioral Tasks: Simulate decision-making paradigms to link oscillations to action selection.
+Clinical Applications:
+Test adaptive deep brain stimulation (DBS) strategies targeting cortically entrained beta.
+Explore harmonic cancellation to disrupt pathological beta in PD.
+Experimental Validation:
+Verify STN beta entrainment via cortical signal cancellation in PD patients.
+Measure phase-dependent STN-GPe interactions in animal models.
+Future Implications
+Extended Circuitry: Incorporate thalamocortical loops to study reverberating oscillations.
+Phase-Amplitude Coupling: Investigate cross-frequency interactions (e.g., theta-gamma).
+Behavioral Tasks: Simulate decision-making paradigms to link oscillations to action selection.
+Clinical Applications:
+Test adaptive deep brain stimulation (DBS) strategies targeting cortically entrained beta.
+Explore harmonic cancellation to disrupt pathological beta in PD.
+Experimental Validation:
+Verify STN beta entrainment via cortical signal cancellation in PD patients.
+Measure phase-dependent STN-GPe interactions in animal models.
+
+
+
+
+
+
+Learning to select actions with spiking neurons in the basal ganglia (Stewart et al., 2012)
+Research question
+How can a biologically plausible spiking neural model of the basal ganglia learn action selection through reinforcement learning, while matching both behavioral and neural data?
+Hypothesis
+A spiking neuron model of the basal ganglia incorporating dopamine-modulated synaptic plasticity between the cortex and striatum can:
+Replicate behavioral learning patterns observed in animal studies (e.g., the bandit task).
+Produce neural spiking activity consistent with empirical recordings in the ventral striatum.
+Generalize to multi-action and multi-state decision-making tasks.
+Methodology
+Neural Model
+Neuron Type: Leaky integrate-and-fire (LIF) neurons with biologically constrained parameters (e.g., membrane time constants, refractory periods).
+Synaptic Dynamics:
+Excitatory (AMPA, τₛ = 2 ms) and inhibitory (GABA, τₛ = 8 ms) synapses.
+Dopaminergic modulation of corticostriatal synapses for learning.
+Network Architecture
+Basal Ganglia Circuit: Based on Gurney et al. (2001), including:
+Striatum (D1/D2 neurons), STN, GPe, GPi.
+Ventral striatum and SNc for reward prediction error (dopamine signal).
+Cortical Input: Distributed state representations via high-dimensional vectors.
+Learning Rule
+Dopamine-Modulated Plasticity:
+Δwᵢⱼ = καⱼaᵢe, where *e* = *r* − Q(s, a) (reward prediction error).
+Local, spike-timing-dependent plasticity driven by phasic dopamine.
+Task Simulations
+Two-Armed Bandit Task:
+Rats choose between left/right paths with probabilistic rewards.
+Rewards switch every 40 trials (dynamic task).
+Model compared to behavioral and spiking data from Kim et al. (2009).
+Extensions:
+Three-action bandit task.
+Multi-state learning (different Q-values per state).
+Validation Metrics
+Behavioral: Choice proportions over trials.
+Neural: Spike timing in ventral striatum vs. empirical data.
+Statistical: Maximum Likely Difference (MLD) for spike train comparisons
+Results
+Behavioral Performance
+The model matched rat behavior in the two-armed bandit task (Figure 7), adapting to reward probability shifts.
+Successfully generalized to 3-action tasks and multi-state learning (Figures 10–12).
+Neural Activity
+Spike patterns in the model’s ventral striatum closely matched empirical data (Figures 8–9).
+MLD analysis showed no significant differences except during reward delivery (error ≤ 5 spikes).
+Learning Dynamics
+Without state information, the model slowly adjusted to reward changes (Figure 10, light gray).
+With distinct state representations, it rapidly switched policies (Figure 10, dark gray).
+Alternating training reduced interference between learned states (Figure 12).
+Future implications
+
+
+
+
+
+
+
+A spiking Basal Ganglia model of synchrony, exploration and decision making (Mandali et al., 2015)
+Research question
+How does the Basal Ganglia (BG) contribute to decision-making, particularly in balancing exploration and exploitation, and how is this process linked to neural synchrony in the BG, especially in Parkinson’s disease (PD)?
+Hypothesis
+The Indirect Pathway (IP) of the BG, particularly the Subthalamic Nucleus (STN)-Globus Pallidus externus (GPe) loop, serves as a neural substrate for exploration during decision-making.
+Neural synchrony in the STN-GPe circuit is a marker for exploration, with increased synchrony (e.g., in PD) leading to reduced exploration.
+Dopamine (DA) modulates the balance between exploration and exploitation by regulating the lateral connection strengths in the STN-GPe network.
+MethodoloModel Architecture
+Neuronal Models:
+STN, GPe, GPi: Modeled as Izhikevich spiking neurons (computationally efficient yet biologically plausible).
+Striatum (D1/D2 MSNs): Modeled as Poisson spiking neurons (reflecting irregular firing patterns).
+Synaptic Connections:
+Direct Pathway (DP): Striatum (D1) → GPi (promotes "Go").
+Indirect Pathway (IP): Striatum (D2) → GPe → STN → GPi (promotes "No-Go" and exploration).
+Hyperdirect Pathway: Cortex → STN → GPi (rapid action suppression).
+Lateral Connections: Gaussian-weighted collaterals in STN and GPe, modulated by DA.
+Tasks Simulated
+Binary Action Selection Task:
+Two competing stimuli (4 Hz vs. 8 Hz) representing low/high salience.
+Actions classified as:
+Go: Select high-salience option (exploitation).
+Explore: Select low-salience option (exploration).
+No-Go: No action selected.
+DA levels varied (0.1–0.9) to observe behavioral regimes.
+n-Armed Bandit Task:
+4-option reward-based decision task (300 trials).
+Rewards drawn from Gaussian distributions with drifting means.
+Exploitation: Choose the highest expected reward.
+Exploration: Choose suboptimal options to gather information.
+Performance compared to human behavioral data (Bourdaud et al., 2008).
+Key Measures
+Synchrony (Rₛᵧₙ𝒸): Phase-based synchrony measure for STN-GPe.
+Firing Rates: Tracked across BG nuclei.
+Exploration Metrics: % exploratory choices, reward prediction error (δ).
+gy
+
+
+Results
+STN-GPe Dynamics:
+Low DA (0.1): High synchrony (Rₛᵧₙ𝒸 ≈ 1), oscillatory bursts (~10 Hz), akin to PD.
+High DA (0.9): Desynchronized activity (Rₛᵧₙ𝒸 ≈ 0.3), tonic firing.
+Intermediate DA (0.4–0.6): Alternating synchrony, enabling exploration.
+Binary Action Selection:
+Low DA: Dominant "No-Go" (high GPi activity).
+Intermediate DA: Peak exploration (anti-phase STN-GPe oscillations).
+High DA: Dominant "Go" (DP dominance).
+n-Armed Bandit Task:
+BG model matched human behavioral data in % exploitation.
+Exploration correlated with STN synchrony:
+Exploitative trials: Low Rₛᵧₙ𝒸 (0.13 ± 0.12).
+Exploratory trials: Higher Rₛᵧₙ𝒸 (0.33 ± 0.18; *p* = 0.002).
+PD Simulation (low DA): Reduced exploration (44% exploitation).
+Role of STN Laterals:
+Increased lateral strength → reduced exploration (mimicking PD).
+STN lesions abolished exploration (consistent with Baunez et al., 2001).
+Future directions
+Cortical Integration:
+Extend the model to include cortical-BG loops (e.g., prefrontal cortex) to study top-down control of exploration.
+Incorporate the hyperdirect pathway (cortex → STN) for rapid action gating.
+GPe-GPi Connections:
+Explore the functional role of the GPe-GPi inhibitory pathway, omitted in this study but anatomically present.
+Clinical Applications:
+Test model predictions in PD patients (e.g., DBS effects on exploration).
+Simulate pharmacological interventions (L-Dopa, DA agonists).
+Enhanced Learning Rules:
+Incorporate structural plasticity (e.g., dendritic spine dynamics) for long-term adaptive behavior.
+Multi-Area Synchrony:
+Study cross-frequency coupling (e.g., beta-gamma oscillations) in BG-thalamocortical networks.
+
+
+
+
+
+
+
+
+Dynamic Behaviour of a Spiking Model of Action Selection in the Basal Ganglia (Stewart 2010)
+Will be difficult to recreate the model
+Research question
+How does the dynamic behavior of a biologically constrained spiking neural model of the basal ganglia explain the timing of action selection, particularly in relation to cognitive cycle times observed in production system models?
+Hypothesis
+A spiking neural model of the basal ganglia, constrained by neurophysiological data, will predict action selection latencies consistent with empirical neural recordings (e.g., ~14–17 ms for single-action selection).
+The model will produce cognitive cycle times (~34–44 ms for simple actions and ~59–73 ms for complex actions) that differ from the standard 50 ms assumption in cognitive modeling, depending on neurotransmitter dynamics and action complexity.
+The time required for action selection will increase when utilities of competing actions are similar.
+Methodology
+Model Architecture
+Neural Components:
+Striatum (D1 & D2 pathways), STN (subthalamic nucleus), GPi/SNr (output nuclei), GPe (globus pallidus external).
+Connections follow known basal ganglia anatomy (direct, indirect, hyperdirect pathways).
+Neuron Model:
+Leaky Integrate-and-Fire (LIF) neurons with biologically realistic parameters (e.g., τRC = 20 ms membrane time constant).
+Each "neuron" in the original rate model is replaced by 20 spiking neurons with heterogeneous tuning curves.
+Synaptic Dynamics:
+Excitatory (AMPA, τs = 2 ms) and inhibitory (GABA, τs = 6.1–10.5 ms) synapses based on neurotransmitter data.
+Action Selection Mechanism
+Input: Cortical inputs encode action utilities.
+Selection:
+Direct pathway (D1 striatum → GPi/SNr): Inhibits output nuclei to disinhibit the thalamus for the selected action.
+Indirect pathway (D2 striatum → GPe → STN → GPi/SNr): Modulates selection via feedback.
+Hyperdirect pathway (cortex → STN): Provides global excitation.
+Output: GPi/SNr inhibition suppresses non-selected actions.
+Simulations
+Single-Action Selection: Measure latency from utility change to action selection (Fig. 9).
+Competing Actions: Vary utility differences between top actions (Fig. 10).
+Cognitive Cycle Timing:
+Simple actions: Chain state transitions (A→B→C→D) via thalamocortical loops.
+Complex actions: Model information routing between cortical areas.
+Data Analysis
+Latency: Time from input change to GPi/SNr output suppression.
+Cycle Time: Interval between consecutive action selections.
+Statistical Validation: Mean and standard deviation over 200 runs.
+
+
+Results
+Action Selection Latency:
+Single action: ~14 ms (matches rodent data; Ryan & Clark, 1991).
+Competing actions: Latency increases to ~38 ms for similar utilities (Fig. 10).
+Cognitive Cycle Times:
+Simple actions: 34–44 ms (Fig. 11), shorter than the standard 50 ms assumption.
+Complex actions (information routing): 59–73 ms (Fig. 12).
+Neurotransmitter Effects:
+GABA time constants (6.1–10.5 ms) critically determine cycle times (shaded region in Fig. 11).
+Future directions
+Biological Validation:
+Test model predictions (e.g., latency for similar utilities) with electrophysiology in primates.
+Incorporate dopamine modulation for learning and reward-based selection.
+Model Extensions:
+Include cortico-striatal plasticity to study habit formation.
+Simulate Parkinson’s disease by degrading striatal or STN pathways.
+Cognitive Modeling:
+Integrate with larger-scale spiking models of working memory or decision-making.
+Compare with human reaction time data in tasks requiring rapid action switching.
+Neuromorphic Applications:
+Implement the model on neuromorphic hardware for real-time robotics.
+
+
+
+
+
+A modeling framework for adaptive lifelong learning with transfer and savings through gating in the prefrontal cortex (Tsuda et al., 2011)
+https://github.com/tsudacode/DynaMoE.
+Research question
+How does the prefrontal cortex (PFC) encode, store, and flexibly switch between multiple schemas (context-dependent behavioral strategies) while avoiding catastrophic forgetting?
+Hypothesis
+A neural network model with hierarchical gating (DynaMoE: Dynamic Mixture of Experts) can mimic PFC functionality by:
+Transfer learning: Leveraging prior knowledge to learn new schemas efficiently.
+Memory savings: Retaining old schemas without interference.
+Neuropsychological alignment: Lesions to the model reproduce impairments seen in PFC-damaged patients (e.g., perseveration errors in the Wisconsin Card Sorting Task, WCST).
+
+
+Methodology
+Model Architecture: DynaMoE
+Gating Network: Receives inputs (sensory, reward, action feedback) and selects which expert to activate.
+Expert Networks: Specialized sub-networks (LSTMs) trained to handle specific schemas (e.g., color/shape/number sorting in WCST).
+Progressive Learning:
+Stage 1: Gating network retunes to solve tasks using existing experts.
+Stage 2: If performance is insufficient, a new expert is added and trained.
+Key Features
+Hierarchical Gating: Separates high-level schema selection (gating) from low-level action strategies (experts).
+Reinforcement Learning: Trained using Advantage Actor-Critic (A2C) on WCST.
+Lesion Studies: Targeted disruptions to gating/expert components to mimic PFC damage.
+Tasks
+Wisconsin Card Sorting Task (WCST): Subjects sort cards by hidden rules (shape/color/number) and adapt to rule switches.
+Modified WCST (MWCST): Removes ambiguous cards to isolate perseveration errors.
+Results
+Transfer Learning:
+Pretrained experts (e.g., shape/color) accelerated learning of new rules (e.g., number) by exploiting hidden symmetries (e.g., cards matching multiple rules).
+New experts specialized in "unsolvable" cases, reducing interference.
+Memory Savings:
+DynaMoE retained old schemas with minimal retraining (78% fewer episodes than standard RNNs).
+Weight changes were confined to the gating network, avoiding catastrophic forgetting.
+Lesion Effects:
+Input Lesions (L1–L3): Increased total errors but low perseveration (e.g., reward/action feedback ablation).
+Forget-Gate Lesions (L4): Caused perseverative errors (similar to dlPFC damage).
+Output Lesions (L5–L7): Disrupted expert selection or value estimation, increasing errors.
+Future directions
+Model Extensions:
+Integrate with cortical-basal ganglia-thalamic loops for richer hierarchy.
+Test on more complex tasks (e.g., hierarchical decision-making).
+Clinical Applications:
+Refine lesion mappings to PFC subregions (e.g., dlPFC vs. vmPFC).
+Simulate post-lesion recovery strategies.
+Machine Learning:
+Scale DynaMoE for lifelong learning in AI (e.g., continual learning without forgetting).
+Explore "learning by analogy" via transfer between experts.
+
+
+Critical Summary of Methods — Wei et al. (2025), Dynamical Modeling of Hippocampal–Basal Ganglia Interactions for Spatial Navigation
+Wei et al. (2025) introduce a biologically grounded spiking neural network (SNN) model that integrates hippocampal and basal ganglia circuits to simulate spatial navigation. The study combines spike-timing-dependent plasticity (STDP) with reward-modulated STDP (R-STDP) to reproduce both goal-directed and habitual navigation behaviors in rodents and robots. The model aims to mechanistically bridge hippocampal spatial mapping with basal ganglia reinforcement learning within a single dynamical system.
+
+Model Architecture
+The system comprises two coupled subsystems:
+Hippocampal module — dentate gyrus (DG), CA3, and CA1 populations arranged in 15×15 grids, encoding allocentric (world-centered) spatial representations. Context neurons provide goal-related inputs to DG, shaping spatial memory through synaptic plasticity.
+
+
+Cortico–basal ganglia loop — including landmark cells (LCs), motor cortex (MC), striatal D1/D2 neurons, subthalamic nucleus (STN), globus pallidus externa (GPe), substantia nigra pars reticulata (SNr), and thalamus (TH). This circuit encodes egocentric (self-centered) stimulus–response associations and executes action selection through a winner-take-all (WTA) mechanism with inhibitory interneurons. The STN serves as a conflict monitor via diffuse excitation to suppress premature or competing actions.
+
+
+The architecture reflects established direct (D1–SNr–TH) and indirect (D2–GPe–SNr–TH) pathways, consistent with anatomical and physiological data.
+
+Neuron and Synapse Models
+All neurons are modeled as leaky integrate-and-fire (LIF) units with standard biophysical parameters (τₘ = 33 ms, Vₗ = −70 mV, Vₜₕ = −55 mV). Synaptic currents combine AMPA (excitatory) and GABA (inhibitory) conductances with dynamic gating variables updated by presynaptic spikes, allowing realistic postsynaptic integration.
+
+Learning Rules
+Two complementary forms of synaptic plasticity govern adaptation:
+STDP (for hippocampus):
+
+
+Applied to DG–CA3 and CA3–CA1 pathways.
+
+
+Weight updates depend on pre–post spike timing differences with long decay constants (up to 4000 ms) to capture extended temporal associations in spatial trajectories.
+
+
+This enables the encoding of sequential place-cell activations and the emergence of predictive spatial maps.
+
+
+Reward-Modulated STDP (R-STDP):
+
+
+Governs Context–DG and LC–D1/D2 synapses, integrating dopaminergic (reward) and cholinergic (exploratory) modulation.
+
+
+Eligibility traces preserve co-activation history until reinforcement signals arrive, solving the distal reward problem.
+
+
+Dopamine bursts upon goal attainment amplify potentiation, while acetylcholine promotes learning during non-rewarded exploration, mirroring in vivo dual neuromodulatory roles.
+
+
+Parameters were adapted from Izhikevich (2007) and Florian (2007), ensuring biophysical realism.
+
+Experimental Implementation
+The model was validated through both simulation and robotic experiments:
+Simulated tasks: open-field navigation, Morris water maze, and plus-maze paradigms were reproduced, including lesion conditions (hippocampal or striatal). The model captured observed behavioral shifts between place and response learning.
+
+
+Real-world validation: a Raspberry Pi–controlled robot with Mecanum wheels used ROS2 communication to implement the model in a 2.5×2.5 m arena. Spatial grids aligned with hippocampal place fields and LC egocentric coding, demonstrating real-world feasibility.
+
+
+
+Methodological Significance
+Wei et al. advance computational neuroscience by combining biophysically plausible spiking dynamics with reinforcement-learning principles. Their dual-loop framework integrates allocentric cognitive mapping and egocentric action learning, offering a unified mechanistic model of adaptive navigation. The explicit modeling of neuromodulation and microcircuit competition provides a physiologically interpretable foundation for bridging neural theory and robotics.
+Critical Summary of Methods — Ao et al. (2024), A Spiking Neural Network Action Decision Method Inspired by Basal Ganglia
+Ao et al. (2024) propose a biologically inspired spiking neural network (SNN) framework that models decision-making through mechanisms derived from the cortico–basal ganglia–thalamic (CBGT) circuit. The study aims to integrate reinforcement learning (RL) and neurophysiological plasticity by introducing a cortico-striatal synaptic learning rule regulated by dopaminergic reward signals, yielding a lightweight Actor–Critic (AC) SNN capable of handling stochastic environments.
+
+Model Overview
+The authors construct a hybrid Actor–Critic architecture, in which:
+The Critic is a conventional artificial neural network (ANN) that computes the state value function (V(s_t)).
+
+
+The Actor is a spiking basal ganglia (BG) network simulating the CBGT loop, including cortical (PFC), striatal (D1/D2 medium spiny neurons), pallidal (GPe/GPi), subthalamic (STN), and thalamic (TH) nodes.
+
+
+Neural activity follows Leaky Integrate-and-Fire (LIF) dynamics, with each neuron emitting a spike when its membrane potential exceeds a threshold, resetting afterward. The striatum’s D1 (direct) and D2 (indirect) pathways compete through inhibitory control of the GPi, replicating biological motor selection circuits.
+
+Cortico-Striatal Learning Rule
+The central methodological innovation is the dopamine-modulated Hebbian plasticity rule linking PFC neurons to striatal D1/D2 populations:
+ [
+ \Delta w_{PFC-D1m} = \lambda_{D1},\delta(t),PFC,D1m + \alpha,r,D1m + \beta,\Phi,D1m
+ ]
+ [
+ \Delta w_{PFC-D2m} = \lambda_{D2},\delta(t),PFC,D2m + \alpha,r,D2m + \beta,\Phi,D2m
+ ]
+ where ( \delta(t) = r(t) - V(s_t) + \gamma V(s_{t+1}) ) is the temporal-difference (TD) error, representing the dopamine (SNc) reward prediction signal.
+ The first term governs DA-dependent synaptic adjustment, the second term directly incorporates environmental rewards, and the third ((\Phi)) introduces an exploration mechanism:
+ [
+ \Phi = \sqrt{\frac{2\ln N}{n}}
+ ]
+ which decreases with repeated trials, ensuring early exploration and later exploitation. This rule enables biologically grounded adaptation while preserving computational efficiency.
+
+Experimental Design
+The model was implemented in the BrainCog SNN framework and evaluated on FrozenLake-v1 (OpenAI Gym). Parameters (e.g., γ = 0.99, α = 0.19) were tuned to balance learning stability and speed. The Actor used only 16 PFC neurons and 8 MSNs, making it significantly smaller than traditional deep RL networks.
+Performance was compared with Deep Q-Network (DQN) and Proximal Policy Optimization (PPO) algorithms. Ao et al. found that their model learned faster and exhibited lower computational complexity, owing to the absence of backpropagation and reliance on feedforward Hebbian updates.
+
+Evaluation
+This methodological approach elegantly bridges neuroscience and machine learning, reproducing dopamine-modulated plasticity in a reinforcement framework. The model’s simplicity—relying on biologically inspired local learning rather than gradient descent—enhances interpretability and efficiency. However, its use of a conventional Critic ANN somewhat compromises full biological plausibility, and evaluation on only a simple grid-world limits generalization claims. Nevertheless, the work represents a clear step toward neuromorphic reinforcement learning with interpretable spiking mechanisms.
+Critical Summary of Methods — Bartlett et al. (2024), Using Vector Symbolic Architectures for Distributed Action Representations in a Spiking Model of the Basal Ganglia
+Bartlett et al. (2024) present a novel computational framework that replaces traditional localist, channel-based action representations in basal ganglia (BG) models with distributed high-dimensional vector representations. This methodological innovation enables a single spiking neural model to represent both discrete and continuous action spaces without requiring additional neural populations. The study integrates Vector Symbolic Architectures (VSA), specifically the Semantic Pointer (SP) framework, into a biologically plausible BG circuit modeled with spiking leaky integrate-and-fire (LIF) neurons.
+
+1. Semantic Pointer Encoding
+The authors adopt the Semantic Pointer Hypothesis (Eliasmith, 2013), which encodes structured information as high-dimensional vectors that can be combined via algebraic operations. Each action ( a_i ) is represented as a unique high-dimensional vector ( A_{a_i} ), scaled by its salience value ( s_i ). All actions and their saliences are combined into a single bundle:
+ [
+ B = s_1 A_{a_1} + s_2 A_{a_2} + \ldots + s_n A_{a_n}
+ ]
+ This “bundled” input vector is pseudo-orthogonal, allowing the model to represent multiple actions simultaneously while maintaining separability. Unlike previous localist models that required one neuronal population per action channel, this encoding scales efficiently to large or continuous action spaces.
+
+2. Adapted Basal Ganglia Model
+The model extends Stewart et al.’s (2010) spiking implementation of the Gurney et al. (2001) BG framework. The circuit preserves the direct (D1), indirect (D2), and hyperdirect (STN–GPi) pathways with inhibitory and excitatory projections reflecting biological structure.
+The cortex provides the bundled input vector ( B ) to the striatum.
+
+
+D1 neurons inhibit the GPi (enabling selected actions).
+
+
+D2 neurons inhibit the GPe, which in turn inhibits both STN and GPi.
+
+
+STN receives direct cortical input and excites GPi and GPe.
+
+
+To replace explicit channel-wise competition, the authors introduce a Laplacian operator–based transformation:
+ [
+ w^+ = A^T L A
+ ]
+ where ( A ) stores the action vectors and ( L ) is a graph Laplacian matrix that enhances the difference between the most and least salient actions. This substitutes the lateral inhibition previously used for discrete channel networks, performing competition directly in high-dimensional vector space.
+
+3. Simulation and Performance Metrics
+The model’s behavior was tested analytically and via spiking simulations using margin-based metrics:
+ [
+ \text{Margin}{\text{out}} - \text{Margin}{\text{in}} = (\max(s_\text{out}) - 2^\text{nd}\max(s_\text{out})) - (\max(s_\text{in}) - 2^\text{nd}\max(s_\text{in}))
+ ]
+ which measures how strongly the BG output amplifies the winning action’s salience relative to competitors.
+ Systematic removal of ReLU nonlinearities revealed that the model performed best without them, suggesting that high-dimensional distributed representations can inherently support winner-take-all behavior without additional thresholding.
+The final spiking model used LIF neurons (up to 512,000 total) and demonstrated biologically consistent GPi firing patterns, with subsets of neurons silenced to permit thalamic disinhibition—mirroring empirical BG activity during action selection.
+
+4. Methodological Evaluation
+This approach provides a proof-of-concept for embedding vector-based symbolic representations into biologically plausible SNNs. It retains the canonical BG connectivity but redefines “action” from a set of discrete channels to a distributed representational manifold. While the reliance on a Laplacian matrix introduces a partially localist assumption, the authors acknowledge this limitation and propose future extensions using fractional binding to fully support continuous-valued actions.
+Overall, Bartlett et al.’s method represents a conceptual leap in computational modeling of the BG—offering a scalable, neurally interpretable route toward unified models of discrete and continuous decision-making in spiking systems.
+

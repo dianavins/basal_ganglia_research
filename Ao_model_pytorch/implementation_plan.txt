@@ -1,0 +1,142 @@
+Final Architecture Specification
+
+  Network Topology (4 parallel action channels)
+
+  Input: State (0-15) → One-hot encoded
+
+  PFC [16 neurons]
+    ├→ D1-MSNs [4] → GPi [4] ────────┐
+    │                                 ├→ Thalamus [4] → PMC [4] → Action
+    └→ D2-MSNs [4] → GPe [4] → STN [4] ┘
+
+  SNc: Computes TD-error δ(t) to modulate PFC→Striatum weights
+
+  Channel routing (diagonal/1-to-1):
+  - Channel 0: PFC → D1₀/D2₀ → GPi₀/GPe₀ → STN₀ → GPi₀ → Thal₀ → PMC₀ (action 0)
+  - Channel 1-3: Same pattern for actions 1-3
+
+  Weight Matrices & Signs
+
+  Learnable (Plastic):
+  - W_PFC_D1: [16, 4] - Excitatory, updated by Eq. (3)
+  - W_PFC_D2: [16, 4] - Excitatory, updated by Eq. (3)
+
+  Fixed (Diagonal Identity-based):
+  - W_D1_GPi: [4, 4] = -1.0 × I₄ (inhibitory)
+  - W_D2_GPe: [4, 4] = -1.0 × I₄ (inhibitory)
+  - W_GPe_STN: [4, 4] = -0.8 × I₄ (inhibitory)
+  - W_STN_GPi: [4, 4] = +1.2 × I₄ (excitatory)
+  - W_GPi_Thal: [4, 4] = -1.0 × I₄ (inhibitory)
+  - W_Thal_PMC: [4, 4] = +1.0 × I₄ (excitatory)
+
+  Weight Initialization
+
+  # Template vectors
+  W1_template = [0.20, 0.12, 0.07, 0.03]  # descending
+  W2_template = [0.03, 0.07, 0.12, 0.20]  # ascending (reversed)
+
+  # For each of 16 PFC neurons:
+  W_PFC_D1[i, :] = W1_template + noise, then L1-normalize to 0.42
+  W_PFC_D2[i, :] = W2_template + noise, then L1-normalize to 0.42
+
+  # noise ~ N(0, 0.01), clipped ≥ 0
+
+  LIF Neuron Parameters
+
+  τ = 1.0          # time constant
+  V_reset = 0.0    # reset potential
+  V_th = 1.0       # initial threshold (adaptive during training)
+  dt = 1.0         # timestep (1ms)
+
+  Temporal Dynamics
+
+  Per environment step:
+  1. Encode state as one-hot → PFC neuron produces constant spiking for T timesteps
+  2. Run LIF dynamics for T timesteps (to be determined - start with T=50?)
+  3. Count PMC spikes over T → action = argmax(PMC_spike_counts)
+
+  Question on T: You mentioned Fig 3 shows 8000 steps but that seems like overkill. I agree - that's probably cumulative training steps, not simulation timesteps per
+  decision. Let's start with T=50 and tune if needed?
+
+  Plasticity Rule (Eq. 3)
+
+  For each action m ∈ {0,1,2,3}:
+
+  Δw_PFC_D1m = λ_D1 * δ(t) * PFC * D1m + α * r * D1m + β * Φ * D1m
+  Δw_PFC_D2m = λ_D2 * δ(t) * PFC * D2m + α * r * D2m + β * Φ * D2m
+
+  where:
+    δ(t) = r + γ*V(s') - V(s)           # TD error
+    Φ = sqrt(2 * ln(N) / n)              # exploration bonus
+    PFC, D1m, D2m = spike counts or rates over T timesteps
+
+    λ_D1, λ_D2, β decay with epoch (cosine/exponential)
+    α = 0.19 (fixed)
+    γ = 0.99
+
+  After update: Clamp weights to [0, 0.4] and optionally renormalize rows.
+
+  Critic Network
+
+  Standard MLP for V(s):
+  Critic:
+    Linear(16, 64) → ReLU
+    Linear(64, 64) → ReLU
+    Linear(64, 1)
+
+  Optimizer: Adam
+  Loss: MSE( V(s), r + γ*V(s') )
+
+  Action Selection
+
+  PMC_spikes = count_spikes_over_T(PMC)  # [4]
+  action = argmax(PMC_spikes)
+
+  Optional improvements:
+  - Lateral inhibition in PMC (off-diagonal -0.2)
+  - Adaptive thresholds for homeostasis
+
+  State Encoding
+
+  FrozenLake state ∈ {0, ..., 15}:
+  def encode_state(state, T):
+      """Returns spike train for PFC neurons"""
+      pfc_spikes = torch.zeros(T, 16)
+      pfc_spikes[:, state] = 1.0  # constant spiking for chosen neuron
+      return pfc_spikes
+
+  ---
+  Implementation Plan
+
+  Now that architecture is locked, here's the coding order:
+
+  Phase 1: Core SNN Components
+
+  1. models/lif_neuron.py - LIF layer with membrane dynamics
+  2. models/basal_ganglia.py - Actor network with all nuclei
+
+  Phase 2: Learning Components
+
+  3. models/critic.py - Simple MLP
+  4. models/plasticity.py - Cortico-striatal update rule + exploration tracking
+
+  Phase 3: Training Infrastructure
+
+  5. config.py - All hyperparameters
+  6. trainer.py - Main training loop
+  7. utils/visualization.py - Plot firing rates like Fig 3
+
+  Phase 4: Testing
+
+  8. Test on FrozenLake-v1
+  9. Compare with DQN/PPO benchmarks
+
+  ---
+  Key Questions Before Coding
+
+  1. Simulation timesteps T per decision: Start with 50? Or do you have a preference?
+  2. Spike representation in plasticity: Use total spike counts or firing rates (spikes/T)?
+  3. Adaptive thresholds: Implement from the start or add later for stability?
+  4. PMC lateral inhibition: Include initially or debug first without it?
+
+  Does this complete specification look correct? Should we proceed with implementing the LIF neuron layer first?
