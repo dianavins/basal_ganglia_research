@@ -48,9 +48,8 @@ class PrioritizedReplayBuffer:
         for transition in transitions:
             self.buffer.append(transition)
 
-            if success:
-                # Store successful transitions separately for prioritized sampling
-                self.successful_transitions.append(transition)
+            # Store ALL transitions for replay (not just successful episodes)
+            self.successful_transitions.append(transition)
 
         self.n_total += len(transitions)
         if success:
@@ -71,9 +70,9 @@ class PrioritizedReplayBuffer:
         self.buffer.append(transition)
         self.n_total += 1
 
-        # If this transition has positive reward, it's valuable
+        # Store ALL transitions for replay (not just rewarding ones)
+        self.successful_transitions.append(transition)
         if reward > 0:
-            self.successful_transitions.append(transition)
             self.n_successes += 1
 
     def sample(self, batch_size=None):
