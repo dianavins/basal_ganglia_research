@@ -65,9 +65,9 @@ class Config:
 
     # ==================== Plasticity Learning Rates (Section 4.1) ====================
     ALPHA = 0.19  # Direct reward modulation (fixed)
-    LAMBDA_D1_INIT = 0.01  # Initial D1 pathway learning rate
-    LAMBDA_D2_INIT = 0.01  # Initial D2 pathway learning rate
-    BETA_INIT = 0.05  # Initial exploration bonus weight
+    LAMBDA_D1_INIT = 0.02  # Initial D1 pathway learning rate (increased for sparse rewards)
+    LAMBDA_D2_INIT = 0.02  # Initial D2 pathway learning rate (increased for sparse rewards)
+    BETA_INIT = 0.08  # Initial exploration bonus weight (increased for more exploration)
     GAMMA = 0.99  # TD discount factor
 
     DECAY_TYPE = 'exponential'  # 'exponential' or 'cosine'

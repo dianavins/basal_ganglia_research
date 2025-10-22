@@ -198,15 +198,29 @@ class CorticostriatalPlasticity:
         self.episode = episode
 
         if self.decay_type == 'exponential':
-            # Exponential decay
-            decay_factor = np.exp(-5.0 * episode / total_episodes)
+            # Exponential decay with warmup period
+            # No decay for first 20% of training, then gentle exponential decay
+            warmup_episodes = int(0.2 * total_episodes)
+            if episode < warmup_episodes:
+                decay_factor = 1.0  # No decay during warmup
+            else:
+                # Gentle exponential decay: -2.0 instead of -5.0
+                progress = (episode - warmup_episodes) / (total_episodes - warmup_episodes)
+                decay_factor = np.exp(-2.0 * progress)
+
             self.lambda_d1 = self.lambda_d1_init * decay_factor
             self.lambda_d2 = self.lambda_d2_init * decay_factor
             self.beta = self.beta_init * decay_factor
 
         elif self.decay_type == 'cosine':
-            # Cosine annealing
-            decay_factor = 0.5 * (1.0 + np.cos(np.pi * episode / total_episodes))
+            # Cosine annealing with warmup
+            warmup_episodes = int(0.2 * total_episodes)
+            if episode < warmup_episodes:
+                decay_factor = 1.0
+            else:
+                progress = (episode - warmup_episodes) / (total_episodes - warmup_episodes)
+                decay_factor = 0.5 * (1.0 + np.cos(np.pi * progress))
+
             self.lambda_d1 = self.lambda_d1_init * decay_factor
             self.lambda_d2 = self.lambda_d2_init * decay_factor
             self.beta = self.beta_init * decay_factor

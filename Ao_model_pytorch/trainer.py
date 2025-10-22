@@ -198,7 +198,7 @@ class BasalGangliaTrainer:
         """
         Epsilon decay schedule for exploration
 
-        Start high (0.9) for exploration, decay to low (0.05) over first 500 episodes
+        Start high (0.9) for exploration, decay to low (0.1) over first 1200 episodes
         This ensures early exploration while Φ bonus is still learning action counts
 
         Args:
@@ -208,8 +208,8 @@ class BasalGangliaTrainer:
             epsilon: probability of random action
         """
         epsilon_start = 0.9
-        epsilon_end = 0.05
-        epsilon_decay_episodes = 500
+        epsilon_end = 0.1  # Keep higher final epsilon (was 0.05)
+        epsilon_decay_episodes = 1200  # Decay over longer period (was 500)
 
         if episode >= epsilon_decay_episodes:
             return epsilon_end
