@@ -1,0 +1,198 @@
+  Phase 1: Software Installation & Setup
+
+  0. Create conda environment called bing_rstdp
+
+  1. Install CoppeliaSim (formerly V-REP)
+    - Download CoppeliaSim EDU (latest version)
+    - Install ROS interface plugin (sim_ros_interface)
+  2. Install ROS (recommend ROS Noetic for Ubuntu 20.04)
+    - Core ROS packages
+    - Python 3 rospy
+    - geometry_msgs, sensor_msgs, std_msgs
+  3. Create ROS workspace
+  mkdir -p ~/lane_keeping_ws/src
+  cd ~/lane_keeping_ws
+  catkin_make
+
+  Phase 2: CoppeliaSim Scene Construction
+
+  Track Geometry (Scenario 1 - Fig. 3)
+
+  Create parametric track with exact dimensions:
+  - Outer lane radii: r1_outer = 2.25m, r2_outer = 2.75m
+  - Inner lane radii: r1_inner = 1.75m, r2_inner = 3.25m
+  - Straight section: l1 = 5.0m
+  - Lane width: 0.5m
+  - Six sections: A(straight), B(left turn), C(straight), D(left turn), E(right turn), F(left turn)
+
+  Implementation: Lua script in CoppeliaSim to create:
+  - Ground plane (asphalt texture)
+  - White solid outer boundary line
+  - White dashed center line (dashes for middle lane)
+  - White solid inner boundary line
+  - Configure materials to have high contrast for DVS detection
+
+  Pioneer P3-DX Robot Setup
+
+  - Import Pioneer P3-DX model (included in CoppeliaSim)
+  - Configure differential drive parameters
+  - Set wheel separation: ~0.33m
+  - Add two starting positions (inner/outer lane)
+
+  DVS Camera Configuration (Critical - Fig. 2)
+
+  - Resolution: 128×128 pixels
+  - Mounting: Front of robot
+  - Depression angle: 30° downward
+  - Field of view: ~60° (estimate from paper figures)
+  - Update rate: 50ms (20 Hz)
+  - Configure to detect only high-contrast changes (lane markings)
+
+  Phase 3: ROS Package Structure
+
+  Create package: lane_keeping_env
+
+  Nodes to implement:
+
+  1. vrep_interface.py
+  - Connects to CoppeliaSim via ROS interface
+  - Publishes robot pose at 50ms
+  - Subscribes to motor commands
+  - Manages simulation start/stop/reset
+
+  2. dvs_simulator.py
+  - Subscribes to vision sensor from CoppeliaSim
+  - Simulates DVS event generation (luminance change detection)
+  - Accumulates events over 10 frames (500ms)
+  - Downsamples to 32×16 as per Fig. 6
+  - Publishes processed DVS state
+
+  3. lane_model.py
+  - Defines parametric centerline model for each scenario
+  - Implements distance calculation function
+  - Publishes signed distance to lane center at 50ms
+  - Identifies current track section (A-F)
+
+  4. reward_calculator.py
+  - Subscribes to distance from lane_model
+  - Calculates rewards (both DQN Gaussian and R-STDP linear)
+  - Publishes reward values
+  - Checks termination conditions
+
+  5. motor_controller.py
+  - Subscribes to action commands (0=left, 1=straight, 2=right)
+  - Converts to differential drive speeds
+  - vs = 1.0 m/s, vt = 0.25 m/s (Table 1)
+  - Publishes to vrep_interface
+
+  Phase 4: Lane Centerline Mathematical Model
+
+  Implement parametric representation:
+
+  class LaneCenterline:
+      def __init__(self, scenario=1):
+          # Define centerline as piecewise parametric curves
+          # Section A: line segment
+          # Section B: circular arc (90° left turn)
+          # etc.
+
+      def get_distance_to_center(self, robot_x, robot_y, lane='outer'):
+          """
+          Returns:
+              distance: signed distance (+ = right, - = left)
+              section: current section (A-F)
+              closest_point: (x, y) on centerline
+          """
+          # Find closest point on centerline
+          # Calculate perpendicular distance
+          # Determine sign using cross product
+
+  Key functions:
+  - point_to_line_distance() - for straight sections
+  - point_to_arc_distance() - for curved sections
+  - get_section_id() - identify which section robot is in
+
+  Phase 5: Episode Management
+
+  Episode Controller (episode_manager.py):
+  - Manages resets
+  - Alternates start position (inner/outer lane) each episode
+  - Checks termination conditions:
+    - DQN: distance > 0.5m
+    - R-STDP: distance > 0.2m
+    - Max steps: 1000 action steps (as per Table 1)
+  - Logs trajectory, distances, rewards
+
+  Phase 6: Configuration Files
+
+  Launch file (scenario_1.launch):
+
+  <launch>
+      <node name="vrep_interface" pkg="lane_keeping_env" type="vrep_interface.py"/>
+      <node name="dvs_simulator" pkg="lane_keeping_env" type="dvs_simulator.py"/>
+      <node name="lane_model" pkg="lane_keeping_env" type="lane_model.py">
+          <param name="scenario" value="1"/>
+          <param name="lane" value="outer"/>
+      </node>
+      <node name="reward_calculator" pkg="lane_keeping_env" type="reward_calculator.py">
+          <param name="reward_type" value="dqn"/>  <!-- or "rstdp" -->
+      </node>
+  </launch>
+
+  Parameters file (params.yaml):
+
+  # Timing
+  dvs_update_rate: 0.05  # 50ms
+  action_rate: 0.5       # 500ms
+  accumulation_frames: 10
+
+  # Track dimensions (Scenario 1)
+  r1_inner: 1.75
+  r1_outer: 2.25
+  r2_inner: 3.25
+  r2_outer: 2.75
+  l1: 5.0
+
+  # Motor speeds (Table 1)
+  vs: 1.0  # straight speed m/s
+  vt: 0.25 # turn differential m/s
+
+  # Reward parameters
+  dqn_sigma: 0.15
+  dqn_reset_distance: 0.5
+  rstdp_cr: 0.01
+  rstdp_reset_distance: 0.2
+
+  Phase 7: Testing & Validation
+
+  1. Track geometry: Verify dimensions match paper
+  2. DVS output: Check 32×16 state images
+  3. Position tracking: Validate distance calculations
+  4. Reward functions: Plot reward vs distance (compare to Figs. 7, 10)
+  5. Timing: Confirm 50ms sensor updates, 500ms action steps
+
+  File Structure:
+
+  bing_rstdp/
+  ├── src/
+  │   └── environment/
+  │       ├── scripts/
+  │       │   ├── vrep_interface.py
+  │       │   ├── dvs_simulator.py
+  │       │   ├── lane_model.py
+  │       │   ├── reward_calculator.py
+  │       │   ├── motor_controller.py
+  │       │   └── episode_manager.py
+  │       ├── launch/
+  │       │   ├── scenario_1.launch
+  │       │   ├── scenario_2.launch
+  │       │   └── scenario_3.launch
+  │       ├── config/
+  │       │   └── params.yaml
+  │       ├── scenes/
+  │       │   ├── scenario_1.ttt  (CoppeliaSim scene)
+  │       │   ├── scenario_2.ttt
+  │       │   └── scenario_3.ttt
+  │       └── CMakeLists.txt
+
+  This plan recreates the exact environment from the paper with ground-truth position tracking and mathematical lane center model for accurate reward calculation.
